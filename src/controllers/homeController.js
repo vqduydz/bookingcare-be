@@ -35,10 +35,28 @@ const getCrud = async (req, res) => {
   });
 };
 
+const updateCrud = async (req, res) => {
+  let userId = req.query.id;
+  if (userId) {
+    let userData = await services.getUserById(userId);
+    return res.render("updatecrud.ejs", {
+      userData,
+    });
+  }
+  return res.send("----user-not--found !");
+};
+
+const putCrud = async (req, res) => {
+  let data = req.body;
+  await services.updateUserData(data);
+  res.redirect("/get-crud");
+};
 export default {
   getHomePage,
   getUsersApi,
   createCrud,
   postCrud,
   getCrud,
+  updateCrud,
+  putCrud,
 };

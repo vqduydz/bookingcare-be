@@ -28,7 +28,8 @@ let createNewUser = async (data) => {
         id: uuidv4(),
         email,
         password: hashPassFromBcrypt,
-        name: `${firstName} ${lastName}`,
+        firstName,
+        lastName,
         position,
         phonenumber,
         gender,
@@ -56,7 +57,7 @@ let hashPassword = (password) => {
 let getAllUser = async () => {
   return new Promise(async (resolve, reject) => {
     try {
-      let users = db.User.findAll({
+      let users = await db.User.findAll({
         raw: true,
       });
       resolve(users);
@@ -65,8 +66,49 @@ let getAllUser = async () => {
     }
   });
 };
+let getUserById = async (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let users = await db.User.findOne({
+        where: { id: userId },
+        raw: true,
+      });
+
+      if (users) resolve(users);
+      else resolve({ data: "emty" });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let updateUserData = async (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findOne({
+        where: {
+          id: data.id,
+        },
+      });
+      if (user) {
+        user.firstName = data.firstName;
+        user.lastName = data.lastName;
+        user.address = data.address;
+        user.phonenumber = data.phonenumber;
+        await user.save();
+        resolve();
+      } else {
+        resolve();
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
 export default {
   createNewUser,
   getAllUser,
+  getUserById,
+  updateUserData,
 };

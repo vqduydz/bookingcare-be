@@ -12,6 +12,8 @@ export const initWebRoutes = (app) => {
   router.get("/create", homeController.createCrud);
   router.post("/post-crud", homeController.postCrud);
   router.get("/get-crud", homeController.getCrud);
+  router.get("/update-crud", homeController.updateCrud);
+  router.post("/put-crud", homeController.putCrud);
 
   //rest api
   return app.use("/", router);
