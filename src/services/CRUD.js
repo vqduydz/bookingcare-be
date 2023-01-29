@@ -20,6 +20,7 @@ let createNewUser = async (data) => {
     address,
     image,
   } = data;
+
   return new Promise(async (resolve, reject) => {
     try {
       let hashPassFromBcrypt = await hashPassword(confirmpassword);
@@ -27,8 +28,7 @@ let createNewUser = async (data) => {
         id: uuidv4(),
         email,
         password: hashPassFromBcrypt,
-        firstName,
-        lastName,
+        name: `${firstName} ${lastName}`,
         position,
         phonenumber,
         gender,
@@ -53,6 +53,20 @@ let hashPassword = (password) => {
   });
 };
 
+let getAllUser = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let users = db.User.findAll({
+        raw: true,
+      });
+      resolve(users);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 export default {
   createNewUser,
+  getAllUser,
 };

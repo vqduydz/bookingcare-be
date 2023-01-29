@@ -9,8 +9,9 @@ export const initWebRoutes = (app) => {
   router.get("/", homeController.getHomePage);
   router.get("/users", homeController.getUsersApi);
   //
-  router.get("/crud", homeController.getCrud);
+  router.get("/create", homeController.createCrud);
   router.post("/post-crud", homeController.postCrud);
+  router.get("/get-crud", homeController.getCrud);
 
   //rest api
   return app.use("/", router);

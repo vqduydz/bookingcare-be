@@ -17,8 +17,8 @@ const getUsersApi = (req, res) => {
   return res.render("users.ejs");
 };
 
-const getCrud = (req, res) => {
-  return res.render("crud.ejs");
+const createCrud = (req, res) => {
+  return res.render("createcrud.ejs");
 };
 
 const postCrud = async (req, res) => {
@@ -28,9 +28,17 @@ const postCrud = async (req, res) => {
   return res.send("----post-Crud");
 };
 
+const getCrud = async (req, res) => {
+  let data = await services.getAllUser();
+  return res.render("getcrud.ejs", {
+    data,
+  });
+};
+
 export default {
   getHomePage,
   getUsersApi,
-  getCrud,
+  createCrud,
   postCrud,
+  getCrud,
 };
