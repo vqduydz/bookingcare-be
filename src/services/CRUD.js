@@ -5,9 +5,6 @@ var salt = bcrypt.genSaltSync(10);
 var hash = bcrypt.hashSync("B4c0//", salt);
 
 let createNewUser = async (data) => {
-  console.log("data-----");
-
-  console.log(data);
   const {
     email,
     password,
@@ -106,9 +103,27 @@ let updateUserData = async (data) => {
   });
 };
 
+let deleteUserById = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findOne({
+        where: { id: userId },
+      });
+      if (user) {
+        await user.destroy();
+      }
+
+      resolve();
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 export default {
   createNewUser,
   getAllUser,
   getUserById,
   updateUserData,
+  deleteUserById,
 };

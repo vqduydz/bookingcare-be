@@ -14,7 +14,7 @@ export const initWebRoutes = (app) => {
   router.get("/get-crud", homeController.getCrud);
   router.get("/update-crud", homeController.updateCrud);
   router.post("/put-crud", homeController.putCrud);
-
+  router.get("/delete-crud", homeController.deleteCrud);
   //rest api
   return app.use("/", router);
 };

@@ -4,7 +4,6 @@ import services from "../services/CRUD";
 let getHomePage = async (req, res) => {
   try {
     let data = await db.User.findAll();
-    console.log(data);
     return res.render("homepage.ejs", {
       data: JSON.stringify(data),
     });
@@ -23,9 +22,7 @@ const createCrud = (req, res) => {
 
 const postCrud = async (req, res) => {
   let mess = await services.createNewUser(req.body);
-  console.log("mess, req.body-----");
-  console.log(mess, req.body);
-  return res.send("----post-Crud");
+  res.redirect("/get-crud");
 };
 
 const getCrud = async (req, res) => {
@@ -51,6 +48,17 @@ const putCrud = async (req, res) => {
   await services.updateUserData(data);
   res.redirect("/get-crud");
 };
+
+const deleteCrud = async (req, res) => {
+  let userId = req.query.id;
+  if (userId) {
+    await services.deleteUserById(userId);
+    res.redirect("/get-crud");
+  } else {
+    return res.send("user not found");
+  }
+};
+
 export default {
   getHomePage,
   getUsersApi,
@@ -59,4 +67,5 @@ export default {
   getCrud,
   updateCrud,
   putCrud,
+  deleteCrud,
 };
