@@ -1,5 +1,5 @@
 import db from "../models/index";
-import services from "../services/CRUD";
+import crudServices from "../services/CRUD";
 
 let getHomePage = async (req, res) => {
   try {
@@ -21,12 +21,12 @@ const createCrud = (req, res) => {
 };
 
 const postCrud = async (req, res) => {
-  let mess = await services.createNewUser(req.body);
+  let mess = await crudServices.createNewUser(req.body);
   res.redirect("/get-crud");
 };
 
 const getCrud = async (req, res) => {
-  let data = await services.getAllUser();
+  let data = await crudServices.getAllUser();
   return res.render("getcrud.ejs", {
     data,
   });
@@ -35,7 +35,7 @@ const getCrud = async (req, res) => {
 const updateCrud = async (req, res) => {
   let userId = req.query.id;
   if (userId) {
-    let userData = await services.getUserById(userId);
+    let userData = await crudServices.getUserById(userId);
     return res.render("updatecrud.ejs", {
       userData,
     });
@@ -45,14 +45,14 @@ const updateCrud = async (req, res) => {
 
 const putCrud = async (req, res) => {
   let data = req.body;
-  await services.updateUserData(data);
+  await crudServices.updateUserData(data);
   res.redirect("/get-crud");
 };
 
 const deleteCrud = async (req, res) => {
   let userId = req.query.id;
   if (userId) {
-    await services.deleteUserById(userId);
+    await crudServices.deleteUserById(userId);
     res.redirect("/get-crud");
   } else {
     return res.send("user not found");

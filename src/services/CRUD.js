@@ -1,22 +1,11 @@
-import db from "../models/index";
-const { v4: uuidv4 } = require("uuid");
-var bcrypt = require("bcryptjs");
+import db from '../models/index';
+const { v4: uuidv4 } = require('uuid');
+var bcrypt = require('bcryptjs');
 var salt = bcrypt.genSaltSync(10);
-var hash = bcrypt.hashSync("B4c0//", salt);
+var hash = bcrypt.hashSync('B4c0//', salt);
 
 let createNewUser = async (data) => {
-  const {
-    email,
-    password,
-    confirmpassword,
-    firstName,
-    lastName,
-    position,
-    phonenumber,
-    gender,
-    address,
-    image,
-  } = data;
+  const { email, password, confirmpassword, firstName, lastName, position, phonenumber, gender, address, image } = data;
 
   return new Promise(async (resolve, reject) => {
     try {
@@ -33,7 +22,7 @@ let createNewUser = async (data) => {
         address,
         image,
       });
-      resolve("created");
+      resolve('created');
     } catch (error) {
       reject(error);
     }
@@ -54,9 +43,7 @@ let hashPassword = (password) => {
 let getAllUser = async () => {
   return new Promise(async (resolve, reject) => {
     try {
-      let users = await db.User.findAll({
-        raw: true,
-      });
+      let users = await db.User.findAll({});
       resolve(users);
     } catch (error) {
       reject(error);
@@ -68,11 +55,10 @@ let getUserById = async (userId) => {
     try {
       let users = await db.User.findOne({
         where: { id: userId },
-        raw: true,
       });
 
       if (users) resolve(users);
-      else resolve({ data: "emty" });
+      else resolve({ data: 'emty' });
     } catch (error) {
       reject(error);
     }
