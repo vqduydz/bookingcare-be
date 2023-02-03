@@ -17,9 +17,11 @@ export const initWebRoutes = (app) => {
   router.post('/put-crud', homeController.putCrud);
   router.get('/delete-crud', homeController.deleteCrud);
   //rest api
-  router.post('/api/login', userController.handleLogin);
-  router.get('/api/user', userController.handleGetUser);
-  router.post('/api/user', userController.handleCreateNewUser);
+  router.post('/login', userController.handleLogin);
+  router.get('/user', userController.handleGetUser);
+  router.post('/user', userController.handleCreateNewUser);
+  router.patch('/user-update', userController.handleUpdateUser);
+  router.delete('/user-delete', userController.handleDeleteUser);
 
-  return app.use('/', router);
+  return app.use('/v1/api', router);
 };
