@@ -111,15 +111,14 @@ let getUser = async (id) => {
 };
 
 let createNewUser = async (data) => {
-  const { email, password, confirmpassword, firstName, lastName, position, phonenumber, gender, address, image } = data;
+  const { email, password, firstName, lastName, position, phonenumber, gender, address, image } = data;
 
   return new Promise(async (resolve, reject) => {
     try {
       let userIsExists = await checkUserExists(email);
       if (!userIsExists) {
-        let hashPassFromBcrypt = await hashPassword(confirmpassword);
+        let hashPassFromBcrypt = await hashPassword(password);
         await User.create({
-          id: uuidv4(),
           email,
           password: hashPassFromBcrypt,
           firstName,

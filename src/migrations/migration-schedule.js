@@ -1,11 +1,12 @@
-"use strict";
+'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("schedules", {
+    await queryInterface.createTable('schedules', {
       id: {
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
+        type: Sequelize.INTEGER,
       },
       currentNumber: {
         type: Sequelize.INTEGER,
@@ -33,6 +34,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("schedules");
+    await queryInterface.dropTable('schedules');
   },
 };

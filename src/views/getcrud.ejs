@@ -69,7 +69,7 @@
 
 <body>
     <div  class="btn-create-box">
-        <a href="/create" class="btn-create"
+        <a href="/v1/api/create" class="btn-create"
         type="button" >Create new user</a>
     </div>
     <table style="width:90%">
@@ -93,13 +93,13 @@
           <td><%= data[i].address %></td>
           <td>
             <a
-              href="/update-crud/?id=<%= data[i].id %>"
+              href="/v1/api/update-crud/?id=<%= data[i].id %>"
               class="btn-edit"
               type="button"
               >Edit</a
             >
             <a
-              href="/delete-crud/?id=<%= data[i].id %>"
+              href="/v1/api/delete-crud/?id=<%= data[i].id %>"
               class="btn-delete"
               type="button"
               >Delete</a

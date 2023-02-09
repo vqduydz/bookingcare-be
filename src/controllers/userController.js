@@ -27,18 +27,20 @@ const handleGetUser = async (req, res) => {
 
 const handleCreateNewUser = async (req, res) => {
   let result = await userServices.createNewUser(req.body);
-  const { code, data } = result;
+  const { code, data, error } = result;
   return res.status(code).json({
-    ...data,
+    data,
+    error,
   });
 };
 
 const handleUpdateUser = async (req, res) => {
   let dataUpdate = req.body;
   let result = await userServices.updateUserData(dataUpdate);
-  const { code, data } = result;
+  const { code, data, error } = result;
   return res.status(code).json({
-    ...data,
+    data,
+    error,
   });
 };
 
@@ -46,9 +48,10 @@ const handleDeleteUser = async (req, res) => {
   let userId = req.body.id;
   if (userId) {
     let result = await userServices.deleteUserById(userId);
-    const { code, data } = result;
+    const { code, data, error } = result;
     return res.status(code).json({
-      ...data,
+      data,
+      error,
     });
   } else {
     return res.status(404).json({

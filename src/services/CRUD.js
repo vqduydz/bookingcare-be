@@ -13,7 +13,6 @@ let createNewUser = async (data) => {
     try {
       let hashPassFromBcrypt = await hashPassword(confirmpassword);
       await User.create({
-        id: uuidv4(),
         email,
         password: hashPassFromBcrypt,
         firstName,

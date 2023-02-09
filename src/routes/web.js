@@ -1,6 +1,7 @@
 import express from 'express';
 import homeController from '../controllers/homeController';
 import userController from '../controllers/userController';
+import allcodeController from '../controllers/allcodeController';
 
 const app = express();
 const port = 3000;
@@ -17,11 +18,17 @@ export const initWebRoutes = (app) => {
   router.post('/put-crud', homeController.putCrud);
   router.get('/delete-crud', homeController.deleteCrud);
   //rest api
+  //users
   router.post('/login', userController.handleLogin);
   router.get('/user', userController.handleGetUser);
   router.post('/user', userController.handleCreateNewUser);
   router.patch('/user-update', userController.handleUpdateUser);
   router.delete('/user-delete', userController.handleDeleteUser);
+  //allcodes
+  router.get('/allcodes', allcodeController.handleGetAllcode);
+  router.post('/allcodes', allcodeController.handleCreateNewAllcode);
+  router.patch('/allcodes-update', allcodeController.handleUpdateAllcode);
+  router.delete('/allcodes-delete', allcodeController.handleDeleteAllcode);
 
   return app.use('/v1/api', router);
 };

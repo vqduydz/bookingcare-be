@@ -6,12 +6,10 @@ module.exports = {
       'allcodes',
       [
         {
-          id: uuidv4(),
           key: 'root@gmail.com',
           type: '123456',
           valueEn: 'Duy Vũ',
           valueVi: 'root',
-
           createdAt: new Date(),
           updatedAt: new Date(),
         },
