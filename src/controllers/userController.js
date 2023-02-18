@@ -89,7 +89,7 @@ const forgotPassword = async (req, res) => {
     // check if user exists
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(404).json({ message: 'Invalid email' });
+      return res.status(404).json({ error: 'Invalid email' });
     }
 
     // generate token and save it to user's resetToken field
@@ -113,10 +113,7 @@ const forgotPassword = async (req, res) => {
       from: process.env.EMAIL_ADDRESS,
       to: user.email,
       subject: 'Password reset',
-      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n
-      Please click on the following link, or paste this into your browser to complete the process:\n
-      ${resetPasswordLink} \n
-      If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\nPlease click on the following link, or paste this into your browser to complete the process:\n${resetPasswordLink} \nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
