@@ -1,34 +1,31 @@
 import express from 'express';
-import homeController from '../controllers/homeController';
 import userController from '../controllers/userController';
-import allcodeController from '../controllers/allcodeController';
+import authenticateToken from '../middlewares/middleware';
+
+const router = express.Router();
 
 const app = express();
 const port = 3000;
 
-const router = express.Router();
 export const initWebRoutes = (app) => {
-  router.get('/', homeController.getHomePage);
-  router.get('/users', homeController.getUsersApi);
-  //
-  router.get('/create', homeController.createCrud);
-  router.post('/post-crud', homeController.postCrud);
-  router.get('/get-crud', homeController.getCrud);
-  router.get('/update-crud', homeController.updateCrud);
-  router.post('/put-crud', homeController.putCrud);
-  router.get('/delete-crud', homeController.deleteCrud);
-  //rest api
-  //users
+  router.get('/', (req, res) => {
+    return res.send('test');
+  });
+  // log in
   router.post('/login', userController.handleLogin);
-  router.get('/user', userController.handleGetUser);
-  router.post('/user', userController.handleCreateNewUser);
-  router.patch('/user-update', userController.handleUpdateUser);
-  router.delete('/user-delete', userController.handleDeleteUser);
-  //allcodes
-  router.get('/allcodes', allcodeController.handleGetAllcode);
-  router.post('/allcodes', allcodeController.handleCreateNewAllcode);
-  router.patch('/allcodes-update', allcodeController.handleUpdateAllcode);
-  router.delete('/allcodes-delete', allcodeController.handleDeleteAllcode);
+  router.get('/login', authenticateToken, (req, res) => res.json(req.user));
+  // forgot password
+  router.post('/forgot-password', userController.forgotPassword);
+  // reset password
+  router.patch('/reset-password/:token', userController.resetPassword);
+  // sign up - create user
+  router.post('/user', userController.createUser);
+  // get user
+  router.get('/user', userController.getUser);
+  // update user data
+  router.patch('/user', userController.updateUserById);
+  // delete user
+  router.delete('/user', userController.deleteUserById);
 
   return app.use('/v1/api', router);
 };

@@ -1,54 +1,70 @@
 'use strict';
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Users', {
       id: {
-        allowNull: false,
+        type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
       },
       password: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       firstName: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       lastName: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
-      position: {
-        type: Sequelize.STRING,
-      },
-      phonenumber: {
+      phoneNumber: {
         type: Sequelize.STRING,
       },
       gender: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       address: {
         type: Sequelize.STRING,
       },
-      birthday: {
-        type: Sequelize.DATE,
-      },
       image: {
         type: Sequelize.STRING,
       },
+      role: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      birthday: {
+        type: Sequelize.DATE,
+      },
+      resetPasswordToken: {
+        type: Sequelize.STRING,
+      },
+      resetPasswordExpires: {
+        type: Sequelize.DATE,
+      },
       createdAt: {
-        type: Sequelize.DATE(3),
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP(3)'),
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updatedAt: {
-        type: Sequelize.DATE(3),
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)'),
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
       },
     });
   },
-  down: async (queryInterface, Sequelize) => {
+  async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Users');
   },
 };
