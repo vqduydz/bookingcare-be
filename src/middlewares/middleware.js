@@ -1,24 +1,39 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
-
-// Middleware function for verifying JSON Web Tokens
-function authenticateToken(req, res, next) {
-  console.log('_______________');
-  const authHeader = req.headers['Authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (token == null) {
-    return res.status(401).json({ error: 'Unauthorized' });
+import db from '../models';
+import { io } from '../server';
+const User = db.User;
+// Middleware for verifying JWT token
+export const verifyToken = (req, res, next) => {
+  // Lấy giá trị của tiêu đề Authorization
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) {
+    return res.status(401).json({ errorMessage: 'Access Denied' });
   }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  const token = authHeader.split(' ')[1];
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     if (err) {
-      return res.status(403).json({ error: 'Forbidden' });
+      return res.status(403).json({ errorMessage: 'Invalid Token' });
     }
-    req.user = user;
+
+    const user = await User.findOne({ where: { email: decoded.email } });
+    if (!user) {
+      return res.status(401).json({ errorMessage: 'Access Denied 111' });
+    }
+
+    req.user = decoded;
     next();
   });
-}
+};
 
-export default authenticateToken;
+// Middleware for checking role of user
+export const checkRole = (roles) => {
+  return (req, res, next) => {
+    const userRole = req.user.role;
+    if (roles.includes(userRole)) {
+      return next();
+    }
+    return res.status(403).json({ errorMessage: 'You do not have permission to perform this action' });
+  };
+};

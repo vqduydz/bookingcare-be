@@ -1,6 +1,6 @@
 import express from 'express';
 import userController from '../controllers/userController';
-import authenticateToken from '../middlewares/middleware';
+import { verifyToken, checkRole } from '../middlewares/middleware';
 
 const router = express.Router();
 
@@ -12,20 +12,31 @@ export const initWebRoutes = (app) => {
     return res.send('test');
   });
   // log in
-  router.post('/login', userController.handleLogin);
-  router.get('/login', authenticateToken, (req, res) => res.json(req.user));
+  router.post('/login', userController.getToken);
+  router.get('/login', verifyToken, userController.handleLogin);
   // forgot password
   router.post('/forgot-password', userController.forgotPassword);
   // reset password
   router.patch('/reset-password/:token', userController.resetPassword);
   // sign up - create user
   router.post('/user', userController.createUser);
+
   // get user
-  router.get('/user', userController.getUser);
+  router.get('/user', verifyToken, checkRole(['Root', 'Admin', 'UserManage']), userController.getUser);
   // update user data
-  router.patch('/user', userController.updateUserById);
+  router.patch(
+    '/user',
+    verifyToken,
+    checkRole(['Customer', 'Root', 'Admin', 'UserManage']),
+    userController.updateUserById,
+  );
   // delete user
-  router.delete('/user', userController.deleteUserById);
+  router.delete(
+    '/user',
+    verifyToken,
+    checkRole(['Customer', 'Root', 'Admin', 'UserManage']),
+    userController.deleteUserById,
+  );
 
   return app.use('/v1/api', router);
 };

@@ -3,32 +3,30 @@ import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import db from '../models';
+import { io } from '../server';
 
 var salt = bcrypt.genSaltSync(10);
 dotenv.config();
 const User = db.User;
 
-const handleLogin = async (req, res) => {
+const getToken = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     // Tìm kiếm user trong database
     const user = await User.findOne({ where: { email: email } });
-
     // Kiểm tra xem email của user có tồn tại không
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email' });
+      return res.status(401).json({ errorMessage: 'Invalid email' });
     }
-
     // Kiểm tra xem password của user có đúng không
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      return res.status(401).json({ error: 'Invalid password' });
+      return res.status(401).json({ errorMessage: 'Invalid password' });
     }
-
     // Tạo JSON Web Token cho user
     const token = jwt.sign(
       {
+        id: user.id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -41,13 +39,14 @@ const handleLogin = async (req, res) => {
       },
       process.env.JWT_SECRET,
     );
-
     // Trả về token cho user
-    return res.json({ token });
+    return res.json({ token, message: 'login successfully' });
   } catch (error) {
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ errorMessage: 'Server error' });
   }
 };
+
+const handleLogin = async (req, res) => res.json(req.user);
 
 const createUser = async (req, res) => {
   try {
@@ -59,7 +58,7 @@ const createUser = async (req, res) => {
 
     // Kiểm tra xem email của user có tồn tại không
     if (user) {
-      return res.status(422).json({ error: 'Email already exists' });
+      return res.status(422).json({ errorMessage: 'Email already exists' });
     }
 
     // hash password
@@ -79,7 +78,7 @@ const createUser = async (req, res) => {
 
     return res.status(200).json({ message: 'User created successfully' });
   } catch (error) {
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ errorMessage: 'Server error' });
   }
 };
 
@@ -89,7 +88,7 @@ const forgotPassword = async (req, res) => {
     // check if user exists
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(404).json({ error: 'Invalid email' });
+      return res.status(404).json({ errorMessage: 'Invalid email' });
     }
 
     // generate token and save it to user's resetToken field
@@ -112,19 +111,19 @@ const forgotPassword = async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_ADDRESS,
       to: user.email,
-      subject: 'Password reset',
-      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\nPlease click on the following link, or paste this into your browser to complete the process:\n${resetPasswordLink} \nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
+      subject: 'Password reset - Đặt lại mật khẩu',
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\nPlease click on the following link, or paste this into your browser to complete the process:\n${resetPasswordLink} \nIf you did not request this, please ignore this email and your password will remain unchanged.\n_______________________________________\n\nBạn nhận được thông báo này vì bạn (hoặc ai đó) đã yêu cầu đặt lại mật khẩu cho tài khoản của bạn.\nVui lòng nhấp vào liên kết sau hoặc dán nó vào trình duyệt của bạn để hoàn tất quy trình:\n${resetPasswordLink} \nNếu bạn đã không yêu cầu điều này, vui lòng bỏ qua email này và mật khẩu của bạn sẽ không thay đổi.\n`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
-        return res.status(500).json({ message: 'Failed to send email' });
+        return res.status(500).json({ errorMessage: 'Failed to send email' });
       } else {
         return res.status(200).json({ message: `An email has been sent to ${user.email} with further instructions.` });
       }
     });
   } catch (error) {
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ errorMessage: 'Server error' });
   }
 };
 
@@ -135,12 +134,12 @@ const resetPassword = async (req, res) => {
     const { email } = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(404).json({ error: 'Email not found' });
+      return res.status(404).json({ errorMessage: 'Invalid email' });
     }
 
     console.log(user.resetPasswordToken !== token);
     if (user.resetPasswordToken !== token || !user.resetPasswordExpires || user.resetPasswordExpires <= new Date()) {
-      return res.status(400).json({ error: 'Invalid or expired token' });
+      return res.status(400).json({ errorMessage: 'Invalid or expired token' });
     }
 
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -150,7 +149,7 @@ const resetPassword = async (req, res) => {
     res.status(200).json({ message: 'Password reset successfully' });
   } catch (error) {
     console.log(123);
-    return res.status(400).json({ error: 'Invalid or expired token' });
+    return res.status(400).json({ errorMessage: 'Invalid or expired token' });
   }
 };
 
@@ -160,14 +159,14 @@ const getUser = async (req, res) => {
     if (id) {
       const user = await User.findOne({ where: { id }, attributes: { exclude: ['password'] } });
       if (!user) {
-        return res.status(404).json({ error: 'User does not exist' });
+        return res.status(404).json({ errorMessage: 'User does not exist' });
       }
       return res.status(200).json({ user });
     }
     const user = await User.findAll({ attributes: { exclude: ['password'] }, order: [['createdAt', 'DESC']] });
     return res.status(200).json({ user });
   } catch (error) {
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ errorMessage: 'Server error' });
   }
 };
 
@@ -177,7 +176,7 @@ const updateUserById = async (req, res) => {
   try {
     const user = await User.findOne({ where: { id: dataUpdate.id } });
     if (!user) {
-      return res.status(404).json({ error: 'User does not exist' });
+      return res.status(404).json({ errorMessage: 'User does not exist' });
     }
     const { id, ...data } = dataUpdate;
     await user.set(data);
@@ -185,25 +184,39 @@ const updateUserById = async (req, res) => {
     return res.status(200).json({ message: 'User updated successfully' });
   } catch (error) {
     console.log(error, dataUpdate.id);
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ errorMessage: 'Server error' });
   }
 };
+
+// const deleteUserById = async (req, res) => {
+//   try {
+//     const { id } = req.body;
+//     const user = await User.findOne({ where: { id } });
+//     if (!user) {
+//       return res.status(404).json({ errorMessage: 'User does not exist' });
+//     }
+//     await user.destroy();
+//     return res.status(200).json({ message: 'User deleted successfully' });
+//   } catch (error) {
+//     return res.status(500).json({ errorMessage: 'Server error' });
+//   }
+// };
 
 const deleteUserById = async (req, res) => {
   try {
     const { id } = req.body;
     const user = await User.findOne({ where: { id } });
     if (!user) {
-      return res.status(404).json({ error: 'User does not exist' });
+      return res.status(404).json({ errorMessage: 'User does not exist' });
     }
     await user.destroy();
     return res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ errorMessage: 'Server error' });
   }
 };
-
 export default {
+  getToken,
   handleLogin,
   createUser,
   forgotPassword,
